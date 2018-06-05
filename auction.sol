@@ -40,7 +40,7 @@ auction_state public STATE;
     
     function bid() public payable {}
     function withdraw() public {}
-    function cancel_auction() public {}
+    function cancel_auction() public returns (bool){}
     
     event BidEvent(address indexed highestBidder, uint256 highestBid);
     event WithdrawalEvent(address withdrawer, uint256 amount);
@@ -88,7 +88,7 @@ function cancel_auction() only_owner  an_ongoing_auction returns (bool){
     
         STATE=auction_state.CANCELLED;
         CanceledEvent("Auction Cancelled", now);
-        return true
+        return true;
      }
     
     
@@ -99,7 +99,7 @@ function destruct_auction()  returns (bool){
      
      for(uint i=0;i<bidders.length;i++)
     {
-        assert(bids[bidders[i]]==0)
+        assert(bids[bidders[i]]==0);
     }
 
     selfdestruct(auction_owner);
