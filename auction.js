@@ -1,134 +1,127 @@
-//var Web3 = require('web3');
+pragma solidity ^0.4.21;
 
-var web3 = new Web3();
- 
-web3.setProvider(new web3.providers.HttpProvider("http://localhost:7545"));
-var bidder = web3.eth.accounts[0];
-web3.eth.defaultAccount = bidder;
-var auctionContract =  web3.eth.contract([{"constant":true,"inputs":[],"name":"Mycar","outputs":[{"name":"Brand","type":"string"},{"name":"Rnumber","type":"string"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[],"name":"get_owner","outputs":[{"name":"","type":"address"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":false,"inputs":[],"name":"bid","outputs":[],"payable":true,"stateMutability":"payable","type":"function"},{"constant":false,"inputs":[],"name":"cancel_auction","outputs":[{"name":"","type":"bool"}],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":false,"inputs":[],"name":"withdraw","outputs":[],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":true,"inputs":[{"name":"","type":"address"}],"name":"bids","outputs":[{"name":"","type":"uint256"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[],"name":"auction_start","outputs":[{"name":"","type":"uint256"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[],"name":"highestBidder","outputs":[{"name":"","type":"address"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":false,"inputs":[],"name":"destruct_auction","outputs":[{"name":"","type":"bool"}],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":true,"inputs":[],"name":"auction_end","outputs":[{"name":"","type":"uint256"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[],"name":"STATE","outputs":[{"name":"","type":"uint8"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[],"name":"highestBid","outputs":[{"name":"","type":"uint256"}],"payable":false,"stateMutability":"view","type":"function"},{"inputs":[{"name":"_biddingTime","type":"uint256"},{"name":"_owner","type":"address"},{"name":"_brand","type":"string"},{"name":"_Rnumber","type":"string"}],"payable":false,"stateMutability":"nonpayable","type":"constructor"},{"payable":false,"stateMutability":"nonpayable","type":"fallback"},{"anonymous":false,"inputs":[{"indexed":true,"name":"highestBidder","type":"address"},{"indexed":false,"name":"highestBid","type":"uint256"}],"name":"BidEvent","type":"event"},{"anonymous":false,"inputs":[{"indexed":false,"name":"withdrawer","type":"address"},{"indexed":false,"name":"amount","type":"uint256"}],"name":"WithdrawalEvent","type":"event"},{"anonymous":false,"inputs":[{"indexed":false,"name":"message","type":"string"},{"indexed":false,"name":"time","type":"uint256"}],"name":"CanceledEvent","type":"event"}]);
-
-
-var contractAddress = "0xc87b5bf15bad4ccc19a90ccddb5d1f226bce47ac";
-var auction = auctionContract.at(contractAddress); 
-
-function bid() {
-
-
-
-var mybid = document.getElementById('value').value;
-// Automatically determines the use of call or sendTransaction based on the method type
-auction.bid({value: web3.toWei(mybid, "ether"), gas: 200000}, function(error, result){
-if(error)	
-{console.log("error is "+ error); 
-document.getElementById("biding_status").innerHTML="Think to bidding higher"; 
-}
-if (!error)
-document.getElementById("biding_status").innerHTML="Successfull bid, transaction ID"+ result; 
-});
-  
-} 
-	
-
-	
-function init(){
- 
-
- auction.auction_end( function(error, result){
-document.getElementById("auction_end").innerHTML=result;
-});
-
-  auction.highestBidder(function(error, result){
-document.getElementById("HighestBidder").innerHTML=result;
-}); 
+contract Auction {
     
-auction.highestBid( function(error, result){
-var bidEther = web3.fromWei(result, 'ether');
-document.getElementById("HighestBid").innerHTML=bidEther;
-
-}); 
-	auction.STATE( function(error, result){
-document.getElementById("STATE").innerHTML=result;
-
-}); 
-
-	auction.Mycar( function(error, result){
-document.getElementById("car_brand").innerHTML=result[0];
-document.getElementById("registration_number").innerHTML=result[1];
-
-}); 
-
-auction.bids(bidder, function(error, result){
-var bidEther = web3.fromWei(result, 'ether');
-document.getElementById("MyBid").innerHTML=bidEther;
-
-console.log(bidder);
-}); 
+address internal auction_owner;
+uint256 public auction_start;
+uint256 public auction_end;
+uint256 public highestBid;
+address public highestBidder;
+ 
 
 
-
-
-}
-  
-  
-
-
-  
-  var auction_owner=null;
-  auction.get_owner(function(error, result){
-	  if (!error){
-		  auction_owner=result;
-	   if(bidder==auction_owner)
-	   $("#auction_owner_operations").hide();
-	  }
-
-}); 
-  
-  
-function cancel_auction(){
-auction.cancel_auction( function(error, result){
-console.log(result);
-}); 
+enum auction_state{
+    CANCELLED,STARTED
 }
 
-function Destruct_auction(){
-auction.destruct_auction( function(error, result){
-console.log(result);
-}); 
+struct  car{
+    string  Brand;
+    string  Rnumber;
 }
-  
-/*filter.get(callback): Returns all of the log entries that fit the filter.
-filter.watch(callback): Watches for state changes that fit the filter and calls the callback. See this note for details.*/
-var BidEvent = auction.BidEvent();
-  
-    BidEvent.watch(function(error, result){
-            if (!error)
-                {
-                    $("#eventslog").html(result.args.highestBidder + ' has bidden(' + result.args.highestBid + ' wei)');
-                } else {
- 
-                    console.log(error);
-                }
-        });
-	
- 
-  
-const filter = web3.eth.filter({
-  fromBlock: 0,
-  toBlock: 'latest',
-  address: contractAddress,
-  topics: [web3.sha3('BidEvent(address,uint256)')]
-})
- 
-filter.get((error, result) => {
-  console.log(result);
-  //console.log(result[0].data);
- 
-})
+
+address[] bidders;
+
+mapping(address => uint) public bids;
+
+auction_state public STATE;
 
 
+    modifier an_ongoing_auction(){
 
-
-
+        require(now <= auction_end);
+        _;
+    }
+    
+    modifier only_owner(){
+        require(msg.sender==auction_owner);
+        
+        _;
+    }
+    
+    function bid() public payable {}
+    function withdraw() public {}
+    function cancel_auction() public returns (bool){}
+    
+    event BidEvent(address indexed highestBidder, uint256 highestBid);
+    event WithdrawalEvent(address withdrawer, uint256 amount);
+    event CanceledEvent(string message, uint256 time);
   
     
+}
+
+
+contract MyAuction is Auction{
+    
+    
+     function ()
+    {
+        
+    }
+    
+    car public Mycar;
+
+    function MyAuction (uint _biddingTime, address _owner,string _brand,string _Rnumber) public {
+        auction_owner = _owner;
+        auction_start=now;
+        auction_end = auction_start + _biddingTime*1 hours;
+        STATE=auction_state.STARTED;
+        Mycar.Brand=_brand;
+        Mycar.Rnumber=_Rnumber;
+        
+    }
+
+ function bid() public payable an_ongoing_auction {
+      
+
+        require(bids[msg.sender]+msg.value> highestBid,"can't bid, Make a higher Bid");
+
+        highestBidder = msg.sender;
+        highestBid = msg.value;
+        bidders.push(msg.sender);
+        bids[msg.sender]=  bids[msg.sender]+msg.value;
+        emit BidEvent(highestBidder,  highestBid);
+
  
+    }
+    
+function cancel_auction() only_owner  an_ongoing_auction returns (bool){
+    
+        STATE=auction_state.CANCELLED;
+        CanceledEvent("Auction Cancelled", now);
+        return true;
+     }
+    
+    
+    
+function destruct_auction()  returns (bool){
+        
+        require(now > auction_end,"can't destruct,Auction is still open");
+     
+     for(uint i=0;i<bidders.length;i++)
+    {
+        assert(bids[bidders[i]]==0);
+    }
+
+    selfdestruct(auction_owner);
+    
+    return true;
+    
+    }
+
+    
+        function withdraw() public {
+            
+        require (now > auction_end ," can't withdraw, Auction is still open");
+        uint amount=0;
+
+        amount=bids[msg.sender];
+        bids[msg.sender]=0;
+        msg.sender.transfer(amount);
+        WithdrawalEvent(msg.sender, amount);
+      
+    }
+    
+    function get_owner() view returns(address){
+        return auction_owner;
+    }
+}
