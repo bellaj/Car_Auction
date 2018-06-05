@@ -5,7 +5,8 @@ var web3 = new Web3();
 web3.setProvider(new web3.providers.HttpProvider("http://localhost:7545"));
 var bidder = web3.eth.accounts[0];
 web3.eth.defaultAccount = bidder;
-var auctionContract = web3.eth.contract([ { "constant": true, "inputs": [], "name": "Mycar", "outputs": [ { "name": "Brand", "type": "string" }, { "name": "Rnumber", "type": "string" } ], "payable": false, "stateMutability": "view", "type": "function" }, { "constant": true, "inputs": [], "name": "get_owner", "outputs": [ { "name": "", "type": "address" } ], "payable": false, "stateMutability": "view", "type": "function" }, { "constant": false, "inputs": [], "name": "bid", "outputs": [], "payable": true, "stateMutability": "payable", "type": "function" }, { "constant": false, "inputs": [], "name": "cancel_auction", "outputs": [], "payable": false, "stateMutability": "nonpayable", "type": "function" }, { "constant": false, "inputs": [], "name": "withdraw", "outputs": [], "payable": false, "stateMutability": "nonpayable", "type": "function" }, { "constant": true, "inputs": [ { "name": "", "type": "address" } ], "name": "bids", "outputs": [ { "name": "", "type": "uint256" } ], "payable": false, "stateMutability": "view", "type": "function" }, { "constant": true, "inputs": [], "name": "auction_start", "outputs": [ { "name": "", "type": "uint256" } ], "payable": false, "stateMutability": "view", "type": "function" }, { "constant": true, "inputs": [], "name": "highestBidder", "outputs": [ { "name": "", "type": "address" } ], "payable": false, "stateMutability": "view", "type": "function" }, { "constant": false, "inputs": [], "name": "destruct_auction", "outputs": [ { "name": "", "type": "bool" } ], "payable": false, "stateMutability": "nonpayable", "type": "function" }, { "constant": true, "inputs": [], "name": "auction_end", "outputs": [ { "name": "", "type": "uint256" } ], "payable": false, "stateMutability": "view", "type": "function" }, { "constant": true, "inputs": [], "name": "STATE", "outputs": [ { "name": "", "type": "uint8" } ], "payable": false, "stateMutability": "view", "type": "function" }, { "constant": true, "inputs": [], "name": "highestBid", "outputs": [ { "name": "", "type": "uint256" } ], "payable": false, "stateMutability": "view", "type": "function" }, { "inputs": [ { "name": "_biddingTime", "type": "uint256" }, { "name": "_owner", "type": "address" }, { "name": "_brand", "type": "string" }, { "name": "_Rnumber", "type": "string" } ], "payable": false, "stateMutability": "nonpayable", "type": "constructor" }, { "payable": false, "stateMutability": "nonpayable", "type": "fallback" }, { "anonymous": false, "inputs": [ { "indexed": true, "name": "highestBidder", "type": "address" }, { "indexed": false, "name": "highestBid", "type": "uint256" } ], "name": "BidEvent", "type": "event" }, { "anonymous": false, "inputs": [ { "indexed": false, "name": "withdrawer", "type": "address" }, { "indexed": false, "name": "amount", "type": "uint256" } ], "name": "WithdrawalEvent", "type": "event" }, { "anonymous": false, "inputs": [ { "indexed": false, "name": "message", "type": "string" }, { "indexed": false, "name": "time", "type": "uint256" } ], "name": "CanceledEvent", "type": "event"} ]);
+var auctionContract =  web3.eth.contract([{"constant":true,"inputs":[],"name":"Mycar","outputs":[{"name":"Brand","type":"string"},{"name":"Rnumber","type":"string"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[],"name":"get_owner","outputs":[{"name":"","type":"address"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":false,"inputs":[],"name":"bid","outputs":[],"payable":true,"stateMutability":"payable","type":"function"},{"constant":false,"inputs":[],"name":"cancel_auction","outputs":[{"name":"","type":"bool"}],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":false,"inputs":[],"name":"withdraw","outputs":[],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":true,"inputs":[{"name":"","type":"address"}],"name":"bids","outputs":[{"name":"","type":"uint256"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[],"name":"auction_start","outputs":[{"name":"","type":"uint256"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[],"name":"highestBidder","outputs":[{"name":"","type":"address"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":false,"inputs":[],"name":"destruct_auction","outputs":[{"name":"","type":"bool"}],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":true,"inputs":[],"name":"auction_end","outputs":[{"name":"","type":"uint256"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[],"name":"STATE","outputs":[{"name":"","type":"uint8"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[],"name":"highestBid","outputs":[{"name":"","type":"uint256"}],"payable":false,"stateMutability":"view","type":"function"},{"inputs":[{"name":"_biddingTime","type":"uint256"},{"name":"_owner","type":"address"},{"name":"_brand","type":"string"},{"name":"_Rnumber","type":"string"}],"payable":false,"stateMutability":"nonpayable","type":"constructor"},{"payable":false,"stateMutability":"nonpayable","type":"fallback"},{"anonymous":false,"inputs":[{"indexed":true,"name":"highestBidder","type":"address"},{"indexed":false,"name":"highestBid","type":"uint256"}],"name":"BidEvent","type":"event"},{"anonymous":false,"inputs":[{"indexed":false,"name":"withdrawer","type":"address"},{"indexed":false,"name":"amount","type":"uint256"}],"name":"WithdrawalEvent","type":"event"},{"anonymous":false,"inputs":[{"indexed":false,"name":"message","type":"string"},{"indexed":false,"name":"time","type":"uint256"}],"name":"CanceledEvent","type":"event"}]);
+
 
 var contractAddress = "0xc87b5bf15bad4ccc19a90ccddb5d1f226bce47ac";
 var auction = auctionContract.at(contractAddress); 
@@ -69,6 +70,31 @@ console.log(bidder);
 }
   
   
+
+
+  
+  var auction_owner=null;
+  auction.get_owner(function(error, result){
+	  if (!error){
+		  auction_owner=result;
+	   if(bidder==auction_owner)
+	   $("#auction_owner_operations").hide();
+	  }
+
+}); 
+  
+  
+function cancel_auction(){
+auction.cancel_auction( function(error, result){
+console.log(result);
+}); 
+}
+
+function Destruct_auction(){
+auction.destruct_auction( function(error, result){
+console.log(result);
+}); 
+}
   
 /*filter.get(callback): Returns all of the log entries that fit the filter.
 filter.watch(callback): Watches for state changes that fit the filter and calls the callback. See this note for details.*/
@@ -79,19 +105,13 @@ var BidEvent = auction.BidEvent();
                 {
                     $("#eventslog").html(result.args.highestBidder + ' has bidden(' + result.args.highestBid + ' wei)');
                 } else {
-                 //   $("#loader").hide();
+ 
                     console.log(error);
                 }
         });
 	
  
-/*
-web3.eth.filter(options, function(error, result){
-  if (!error)
-    console.log(result);
-});
-*/
- 
+  
 const filter = web3.eth.filter({
   fromBlock: 0,
   toBlock: 'latest',
