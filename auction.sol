@@ -84,10 +84,11 @@ contract MyAuction is Auction{
  
     }
     
-function cancel_auction() only_owner  an_ongoing_auction{
+function cancel_auction() only_owner  an_ongoing_auction returns (bool){
     
         STATE=auction_state.CANCELLED;
         CanceledEvent("Auction Cancelled", now);
+        return true
      }
     
     
@@ -102,6 +103,8 @@ function destruct_auction()  returns (bool){
     }
 
     selfdestruct(auction_owner);
+    
+    return true;
     
     }
 
