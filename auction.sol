@@ -18,7 +18,7 @@ struct  car{
     string  Brand;
     string  Rnumber;
 }
-
+car public Mycar;
 address[] bidders;
 
 mapping(address => uint) public bids;
@@ -58,12 +58,12 @@ contract MyAuction is Auction{
         
     }
     
-    car public Mycar;
+  
 
     function MyAuction (uint _biddingTime, address _owner,string _brand,string _Rnumber) public {
         auction_owner = _owner;
         auction_start=now;
-        auction_end = auction_start + _biddingTime*1  minutes;
+        auction_end = auction_start + _biddingTime*1  hours;
         STATE=auction_state.STARTED;
         Mycar.Brand=_brand;
         Mycar.Rnumber=_Rnumber;
@@ -86,8 +86,6 @@ contract MyAuction is Auction{
     }
     
  
-        uint256 public a= this.balance;
-    
   
 function cancel_auction() only_owner  an_ongoing_auction returns (bool){
     
