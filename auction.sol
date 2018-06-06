@@ -63,12 +63,13 @@ contract MyAuction is Auction{
     function MyAuction (uint _biddingTime, address _owner,string _brand,string _Rnumber) public {
         auction_owner = _owner;
         auction_start=now;
-        auction_end = auction_start + _biddingTime*1 hours;
+        auction_end = auction_start + _biddingTime*1  minutes;
         STATE=auction_state.STARTED;
         Mycar.Brand=_brand;
         Mycar.Rnumber=_Rnumber;
         
     }
+ 
 
  function bid() public payable an_ongoing_auction {
       
@@ -84,6 +85,10 @@ contract MyAuction is Auction{
  
     }
     
+ 
+        uint256 public a= this.balance;
+    
+  
 function cancel_auction() only_owner  an_ongoing_auction returns (bool){
     
         STATE=auction_state.CANCELLED;
@@ -110,9 +115,8 @@ function destruct_auction()  returns (bool){
 
     
         function withdraw() public {
-            
-        require (now > auction_end ," can't withdraw, Auction is still open");
-        uint amount=0;
+        require(now > auction_end ," can't withdraw, Auction is still open");
+        uint amount;
 
         amount=bids[msg.sender];
         bids[msg.sender]=0;
