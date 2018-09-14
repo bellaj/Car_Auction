@@ -83,7 +83,8 @@ console.log(result);
   
 /*filter.get(callback): Returns all of the log entries that fit the filter.
 filter.watch(callback): Watches for state changes that fit the filter and calls the callback. See this note for details.*/
-var BidEvent = auction.BidEvent();
+var BidEvent = auction.BidEvent(); // var BidEvent = auction.BidEvent(({}, {fromBlock: 0, toBlock: 'latest'});
+
   
     BidEvent.watch(function(error, result){
             if (!error)
