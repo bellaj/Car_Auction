@@ -68,7 +68,7 @@ function MyAuction (uint _biddingTime, address _owner,string _brand,string _Rnum
 
  function bid() public payable an_ongoing_auction returns (bool){
       
-        require(bids[msg.sender]+msg.value> highestBid,"can't bid, Make a higher Bid");
+        require(bids[msg.sender]+msg.value> highestBid,"You can't bid, Make a higher Bid");
         highestBidder = msg.sender;
         highestBid = msg.value;
         bidders.push(msg.sender);
@@ -89,9 +89,9 @@ function cancel_auction() external only_owner  an_ongoing_auction returns (bool)
     
     
     
-function destruct_auction() external returns (bool){
+function destruct_auction() external only_owner returns (bool){
         
-    require(now > auction_end,"can't destruct,Auction is still open");
+    require(now > auction_end,"You can't destruct the contract,The auction is still open");
      for(uint i=0;i<bidders.length;i++)
     {
         assert(bids[bidders[i]]==0);
@@ -104,7 +104,7 @@ function destruct_auction() external returns (bool){
 
     
 function withdraw() public returns (bool){
-        require(now > auction_end ," can't withdraw, Auction is still open");
+        require(now > auction_end ,"You can't withdraw, the auction is still open");
         uint amount;
 
         amount=bids[msg.sender];
